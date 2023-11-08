@@ -1,0 +1,564 @@
+openapi: 3.0.0
+info:
+  title: devHive API Documentation
+  description: Written and tested by [Mr. Hasan](https://github.com/hasanshahriar32).<br /><br /><b> [Visit Site](https://devhiveclient.vercel.app)</b>
+  version: 1.0.0
+servers:
+  - url: https://devhiveserver.vercel.app
+    description: Internal staging server for testing
+  - url: http://localhost:5000
+    description: Development Server
+  - url: https://server-five-lime.vercel.app
+    description: Main working server
+paths:
+  /user/user:
+    get:
+      tags:
+        - User
+      summary: "Get a list (limit: 10) of users by search "
+      description: Search by email address or name.
+      parameters:
+        - name: search
+          in: query
+          description: "User's email or name"
+          required: true
+          type: string
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                _id:
+                  type: string
+                  description: "User ID"
+                name:
+                  type: string
+                  description: "User name"
+                email:
+                  type: string
+                  description: "User email"
+
+  /user:
+    post:
+      tags:
+        - User
+      summary: Register user or (if exists) login a user.
+      description: |
+        Request:<br /><br />
+        name (string)<br />
+        email (required, string)<br />
+        uid (required, string)<br />
+        verified (boolean)<br />
+        pic (string)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "hasan"
+                email:
+                  type: string
+                  example: "email@uniqueuser.com"
+                uid:
+                  type: string
+                  example: "UN1QU3u1d"
+                verified:
+                  type: boolean
+                  example: true
+                pic:
+                  type: string
+                  example: "https://e1.pngegg.com/pngimages/444/382/png-clipart-frost-pro-for-os-x-icon-set-now-free-contacts-male-profile.png"
+      responses:
+        "200":
+          description: The web server is working correctly!
+        "201":
+          description: User create success!
+        "422":
+          description: User already exists!
+        "400":
+          description: Invalid user
+
+  paths:
+  /user/{_id}:
+    get:
+      tags:
+        - User
+      summary: Detail info of a single user.
+      description: Return a list of a user's detail info.
+      parameters:
+        - name: _id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "643dd81016971d6822d3cae3"
+      responses:
+        "200":
+          description: OK!
+
+    patch:
+      tags:
+        - User
+      summary: Edit user details.
+      description: |
+        Request:<br /><br />
+        name (string)<br />
+        email (required, string)<br />
+        uid (required, string)<br />
+        verified (boolean)<br />
+        pic (string)
+      parameters:
+        - in: path
+          name: _id
+          required: true
+          description: The ID of the user to edit.
+          schema:
+            type: string
+            example: "643dd81016971d6822d3cae3"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "hasan"
+                email:
+                  type: string
+                  example: "email@uniqueuser.com"
+                uid:
+                  type: string
+                  example: "UN1QU3u1d"
+                verified:
+                  type: boolean
+                  example: true
+                pic:
+                  type: string
+                  example: "https://e1.pngegg.com/pngimages/444/382/png-clipart-frost-pro-for-os-x-icon-set-now-free-contacts-male-profile.png"
+
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: The web server is working correctly!
+        "404":
+          description: User not found!
+        "422":
+          description: Invalid user data!
+
+    delete:
+      tags:
+        - User
+      summary: Delete user.
+      parameters:
+        - in: path
+          name: _id
+          required: true
+          description: The ID of the user to delete.
+          schema:
+            type: string
+            example: "643dd81016971d6822d3cae3"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: The web server is working correctly!
+        "404":
+          description: User not found!
+
+  
+  /user/all:
+    get:
+      tags:
+        - User
+      summary: Get Detail info of all users.
+      description: |
+        <strong>Only admins can access this!<br /><hr /></strong>
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Number of users per page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK!
+        "401":
+          description: Unauthorized!
+    security:
+      - bearerAuth: []
+  /category:
+    get:
+      tags:
+        - Category
+      summary: Detail info of all categories.
+      description: Everyone can access this endpoint.
+      responses:
+        "200":
+          description: OK!
+
+    post:
+      tags:
+        - Category
+      summary: Register category or (if exists) get details of it.
+      description: |
+        <strong>Only admins can access this!<br /><hr /></strong>
+        Request:<br /><br />
+        name (string)<br />
+        image (string)
+        route (required, string)<br />
+        about (string)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Programming & Tech"
+                image:
+                  type: string
+                  example: "https://i.pinimg.com/originals/e4/26/70/e426702edf874b181aced1e2fa5c6cde.gif"
+                route:
+                  type: string
+                  example: "/programming"
+                about:
+                  type: string
+                  example: "about the programming section/ category"
+
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: The web server is working correctly!
+        "201":
+          description: Category create success!
+        "422":
+          description: Category already exists!
+        "400":
+          description: Invalid Category
+        "401":
+          description: Unauthorized!
+
+
+    
+  paths:
+  /category/{_id}:
+    get:
+      tags:
+        - Category
+      summary: Detail info of a single Category.
+      description: Return a list of a category's detail info.
+      parameters:
+        - name: _id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "6438a5eb2118772c696bccd3"
+      responses:
+        "200":
+          description: OK!
+
+    patch:
+      tags:
+        - Category
+      summary: Edit category details.
+      description: |
+        <strong>Only admins can access this!<br /><hr /></strong>
+        Request:<br /><br />
+        name (string)<br />
+        image (string)
+        route (required, string)<br />
+        about (string)
+      parameters:
+        - in: path
+          name: _id
+          required: true
+          description: The ID of the category to edit.
+          schema:
+            type: string
+            example: "6438a5eb2118772c696bccd3"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Programming & Tech"
+                image:
+                  type: string
+                  example: "https://i.pinimg.com/originals/e4/26/70/e426702edf874b181aced1e2fa5c6cde.gif"
+                route:
+                  type: string
+                  example: "/programming"
+                about:
+                  type: string
+                  example: "about the programming section/ category"
+
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: The web server is working correctly!
+        "404":
+          description: Category not found!
+        "422":
+          description: Invalid Category data!
+        "401":
+          description: Unauthorized!
+
+    delete:
+      tags:
+        - Category
+      summary: Delete Category.
+      description: |
+        <strong>Only admins can access this!<br /><hr /></strong>
+      parameters:
+        - in: path
+          name: _id
+          required: true
+          description: The ID of the Category to delete.
+          schema:
+            type: string
+            example: "643f22cd880dfeab0d4efae9"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: The web server is working correctly!
+        "404":
+          description: Category not found!
+        "401":
+          description: Unauthorized!
+
+  
+
+
+  paths:
+  /admin:
+    post:
+      tags:
+        - Admin
+      summary: Register admin or (if exists) login a admin.
+      description: |
+        <ul>The requested id should be registered as an user</ul>
+        Request:<br /><br />
+        _id (required, string)<br />
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: "643ba76fbcc93dcd0016a44c"
+                adminmakerpass:
+                  type: string
+                  example: ""
+                adminmaker:
+                  type: string
+                  example: "643378688002fac4f0138cbe"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: The web server is working correctly!
+        "201":
+          description: Admin create success!
+        "422":
+          description: Admin already exists!
+        "400":
+          description: Invalid Admin data or credential!
+        "401":
+          description: Unauthorized!
+  paths:
+  /admin/all:
+    get:
+      tags:
+        - Admin
+      summary: Get Detail info of all admins.
+      description: |
+        <strong>Only admins can access this!<br /><hr /></strong>
+      
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK!
+        "401":
+          description: Unauthorized!
+
+  paths:
+  /admin/{_id}:
+    get:
+      tags:
+        - Admin
+      summary: Detail info of a single Admin.
+      description: <strong>Only a admin can access this for his own info!<br /><hr /></strong> <br />Return a list of a Admin's detail info.
+      parameters:
+        - name: _id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "643378688002fac4f0138cbe"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK!
+        "401":
+          description: Unauthorized!
+
+    patch:
+      tags:
+        - Admin
+      summary: Edit admin password.
+      description: |
+        <strong>Only a admin can access this for his own pass change!<br /><hr /></strong>
+        Request:<br /><br />
+        currentPassword (required, string)<br />
+        newPassword (required, string)<br />
+      parameters:
+        - in: path
+          name: _id
+          required: true
+          description: The ID of the admin to edit.
+          schema:
+            type: string
+            example: "643378688002fac4f0138cbe"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                currentPassword:
+                  type: string
+                  example: ""
+                newPassword:
+                  type: string
+                  example: ""
+                
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: The web server is working correctly!
+        "404":
+          description: Admin not found!
+        "422":
+          description: Invalid Admin data!
+        "401":
+          description: Unauthorized!
+        "400":
+          description: Invalid Credential!
+
+    delete:
+      tags:
+        - Admin
+      summary: Delete Admin.
+      parameters:
+        - in: path
+          name: _id
+          required: true
+          description: The ID of the Admin to delete.
+          schema:
+            type: string
+            example: "643dd81016971d6822d3cae3"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                adminterminator:
+                  type: string
+                  example: ""
+                adminterminatorpass:
+                  type: string
+                  example: ""
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: The web server is working correctly!
+        "404":
+          description: Admin not found!
+        "401":
+          description: Unauthorized!
+        "400":
+          description: Invalid Credential!
+  
+  
+  paths:
+  /admin/user/{_id}:  
+    
+    delete:
+      tags:
+        - Admin
+      summary: Delete User.
+      parameters:
+        - in: path
+          name: _id
+          required: true
+          description: The ID of the User to delete.
+          schema:
+            type: string
+            example: "643dd81016971d6822d3cae3"
+      
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: The web server is working correctly!
+        "404":
+          description: User not found!
+        "401":
+          description: Unauthorized or The user is an admin! Remove from admin first.
+        "400":
+          description: Invalid Credential!
+
+  
+
+# bearer token auth added
+components:
+  securitySchemes:
+    bearerAuth:
+      type: apiKey
+      name: Authorization
+      in: header
+      description: Enter your JWT token with the prefix 'Bearer '.
